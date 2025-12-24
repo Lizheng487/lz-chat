@@ -9,6 +9,7 @@ import path from "node:path";
 import type { WindowNames } from "@common/types";
 import { debounce } from "@common/utils";
 import { IPC_EVENTS } from "@common/constants";
+import logManager from "./LogService";
 
 interface SizeOption {
   width: number;
@@ -34,6 +35,7 @@ class WindowService {
   private static _instance: WindowService;
   private constructor() {
     this._setupIpcEvents();
+    logManager.info("WindowService initialized successfully.");
   }
   private _setupIpcEvents() {
     const handleCloseWindow = (e: IpcMainEvent) => {
@@ -67,7 +69,7 @@ class WindowService {
     this._setupWinLifecycle(window, name)._loadWindowTemplate(window, name);
     return window;
   }
-  private _setupWinLifecycle(window: BrowserWindow, _name: WindowNames) {
+  private _setupWinLifecycle(window: BrowserWindow, name: WindowNames) {
     const updateWinStatus = debounce(
       () =>
         !window?.isDestroyed() &&
@@ -80,6 +82,7 @@ class WindowService {
     window.once("closed", () => {
       window?.destroy();
       window?.removeListener("resize", updateWinStatus);
+      logManager.info(`Window closed: ${name}`);
     });
     window.on("resize", updateWinStatus);
     return this;

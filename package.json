@@ -1,8 +1,8 @@
 {
-  "name": "electron-demo",
-  "productName": "electron-demo",
+  "name": "lz-chat",
+  "productName": "LzChat",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "AI Chatting By Lz",
   "main": ".vite/build/index.js",
   "scripts": {
     "start": "electron-forge start",

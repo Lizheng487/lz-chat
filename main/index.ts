@@ -1,12 +1,18 @@
 import { app, BrowserWindow } from "electron";
 import started from "electron-squirrel-startup";
 import { setupWindows } from "./wins";
+import logManager from "./service/LogService";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
 }
-
+process.on("uncaughtException", (error) => {
+  logManager.error("uncaughtException", error);
+});
+process.on("unhandledRejection", (reason, promise) => {
+  logManager.error("unhandledRejection", reason, promise);
+});
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
