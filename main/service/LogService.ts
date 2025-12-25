@@ -11,7 +11,7 @@ const unlinkAsync = promisify(fs.unlink);
 
 class LogService {
   private static _instance: LogService;
-  private LOG_ERTENTION_DAYS = 7;
+  private LOG_RETENTION_DAYS = 7;
   private readonly CLEANUP_INTERVAL_MS = 24 * 60 * 60 * 1000;
   private constructor() {
     const logPath = path.join(app.getPath("userData"), "logs");
@@ -47,12 +47,12 @@ class LogService {
       if (!fs.existsSync(logPath)) return;
       const now = new Date();
       const expirationDate = new Date(
-        now.getTime() - this.LOG_ERTENTION_DAYS * 24 * 60 * 60 * 1000
+        now.getTime() - this.LOG_RETENTION_DAYS * 24 * 60 * 60 * 1000
       );
       const files = await readdirAsync(logPath);
       let deletedCount = 0;
       for (const file of files) {
-        if (!file.endsWith(".log")) return;
+        if (!file.endsWith(".log")) continue;
         const filePath = path.join(logPath, file);
         try {
           const stats = await statAsync(filePath);

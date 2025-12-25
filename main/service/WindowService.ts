@@ -10,6 +10,7 @@ import type { WindowNames } from "@common/types";
 import { debounce } from "@common/utils";
 import { IPC_EVENTS } from "@common/constants";
 import logManager from "./LogService";
+import themeManager from "./ThemeService";
 
 interface SizeOption {
   width: number;
@@ -22,6 +23,8 @@ interface SizeOption {
 const SHARED_WINDOW_OPTIONS = {
   titleBarStyle: "hidden",
   title: "LzChat",
+  darkTheme: themeManager.isDark,
+  backgroundColor: themeManager.isDark ? "#2c2c2c" : "#ffffff",
   webPreferences: {
     nodeIntegration: false, //禁用Node.js集成
     contextIsolation: true, //启用上下文隔离
