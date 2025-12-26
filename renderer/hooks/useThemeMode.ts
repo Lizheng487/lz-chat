@@ -3,13 +3,22 @@ const iconMap = new Map([
   ["light", "material-symbols:light-mode-outline"],
   ["dark", "material-symbols:dark-mode-outline"],
 ]);
+const tooltipMap = new Map([
+  ["system", "settings.theme.system"],
+  ["light", "settings.theme.light"],
+  ["dark", "settings.theme.dark"],
+]);
 export function useThemeMode() {
+  const { t } = useI18n();
   const themeMode = ref<ThemeMode>("dark");
   const isDark = ref<boolean>(false);
   const themeChangeCallbacks: Array<(mode: ThemeMode) => void> = [];
   const themeIcon = computed(
     () =>
       iconMap.get(themeMode.value) || "material-symbols:auto-awesome-outline"
+  );
+  const themeTooltip = computed(() =>
+    t(tooltipMap.get(themeMode.value) || "settings.theme.system")
   );
 
   function setThemeMode(mode: ThemeMode) {
@@ -37,6 +46,7 @@ export function useThemeMode() {
   });
   return {
     themeIcon,
+    themeTooltip,
     themeMode,
     isDark,
     setThemeMode,

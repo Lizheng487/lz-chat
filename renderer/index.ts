@@ -6,6 +6,6 @@ import App from "./App.vue";
 import errorHandler from "./utils/errorHandler";
 
 createApp(App)
-  .use(await i18n)
+  .use(i18n)
   .use(errorHandler)
   .mount("#app");
