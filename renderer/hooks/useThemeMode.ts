@@ -32,7 +32,7 @@ export function useThemeMode() {
     themeChangeCallbacks.push(callback);
   }
   onMounted(async () => {
-    window.api.onSystenThemeChange((_isDark) =>
+    window.api.onSystemThemeChange((_isDark) =>
       window.api.getThemeMode().then((res) => {
         isDark.value = _isDark;
         if (res !== themeMode.value) {

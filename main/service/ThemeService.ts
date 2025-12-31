@@ -45,5 +45,5 @@ class ThemeService {
     return nativeTheme.themeSource;
   }
 }
-export const themeService = ThemeService.getInstance();
-export default themeService;
+export const themeManager = ThemeService.getInstance();
+export default themeManager;

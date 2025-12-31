@@ -8,7 +8,7 @@ interface WindowApi {
   setThemeMode: (mode: ThemeMode) => Promise<boolean>;
   getThemeMode: () => Promise<ThemeMode>;
   isDarkTheme: () => Promise<boolean>;
-  onSystenThemeChange: (callback: (isDark: boolean) => void) => void;
+  onSystemThemeChange: (callback: (isDark: boolean) => void) => void;
   logger: {
     debug: (message: string, ...meta: any[]) => void;
     info: (message: string, ...meta: any[]) => void;

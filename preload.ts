@@ -16,7 +16,7 @@ const api: WindowApi = {
     ipcRenderer.invoke(IPC_EVENTS.SET_THEME_MODE, mode),
   getThemeMode: () => ipcRenderer.invoke(IPC_EVENTS.GET_THEME_MODE),
   isDarkTheme: () => ipcRenderer.invoke(IPC_EVENTS.IS_DARK_THEME),
-  onSystenThemeChange: (callback: (isDark: boolean) => void) =>
+  onSystemThemeChange: (callback: (isDark: boolean) => void) =>
     ipcRenderer.on(IPC_EVENTS.THEME_MODE_UPDATED, (_, isDark) =>
       callback(isDark)
     ),
