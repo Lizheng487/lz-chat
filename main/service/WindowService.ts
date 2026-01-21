@@ -34,8 +34,17 @@ const SHARED_WINDOW_OPTIONS = {
   },
 } as BrowserWindowConstructorOptions;
 
+interface WindowState {
+  instance: BrowserWindow | void;
+  isHidden: boolean;
+  onCreate: ((window: BrowserWindow) => void)[];
+  onClosed: ((window: BrowserWindow) => void)[];
+}
 class WindowService {
   private static _instance: WindowService;
+  private _winStates: Record<WindowNames | string, WindowState> = {
+    main: { instance: void 0, isHidden: false, onCreate: [], onClosed: [] },
+  };
   private constructor() {
     this._setupIpcEvents();
     logManager.info("WindowService initialized successfully.");
@@ -70,6 +79,7 @@ class WindowService {
       ...size,
     });
     this._setupWinLifecycle(window, name)._loadWindowTemplate(window, name);
+    this._winStates[name].onCreate.forEach((callback) => callback(window));
     return window;
   }
   private _setupWinLifecycle(window: BrowserWindow, name: WindowNames) {
@@ -83,6 +93,7 @@ class WindowService {
       80
     );
     window.once("closed", () => {
+      this._winStates[name].onClosed.forEach((callback) => callback(window));
       window?.destroy();
       window?.removeListener("resize", updateWinStatus);
       logManager.info(`Window closed: ${name}`);
@@ -114,6 +125,18 @@ class WindowService {
   public toggleMax(target: BrowserWindow | void | null) {
     if (!target) return;
     target.isMaximized() ? target.unmaximize() : target.maximize();
+  }
+  public onWindowCreate(
+    name: WindowNames,
+    callback: (window: BrowserWindow) => void
+  ) {
+    this._winStates[name].onCreate.push(callback);
+  }
+  public onWindowClosed(
+    name: WindowNames,
+    callback: (window: BrowserWindow) => void
+  ) {
+    this._winStates[name].onClosed.push(callback);
   }
 }
 export const windowManager = WindowService.getInstance();

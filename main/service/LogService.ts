@@ -111,6 +111,17 @@ class LogService {
   public error(message: string, ...meta: any[]): void {
     log.error(message, ...meta);
   }
+  public logUserOperation(
+    operation: string,
+    userId: string = "unknown",
+    details: any = {}
+  ): void {
+    this.info(
+      `User operation: ${operation}by ${userId}, details:${JSON.stringify(
+        details
+      )}`
+    );
+  }
 }
 export const logManager = LogService.getInstance();
 export default logManager;
