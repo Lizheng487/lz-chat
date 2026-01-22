@@ -7,20 +7,26 @@ import { useContextMenu } from './useContextMenu';
 import { Conversation } from '@common/types';
 import { createContextMenu } from '@renderer/utils/contextMenu';
 import { CONVERSATION_ITEM_MENU_IDS, MENU_IDS } from '@common/constants';
+import { useConversationsStore } from '@renderer/stores/conversations';
 
 defineOptions({ name: 'ConversationList' });
 
+const conversationsStore = useConversationsStore();
 const { conversations } = useFilter();
 const { handle: handleListContextMenu } = useContextMenu();
 const conversationItemActionPolicy = new Map([
-  [CONVERSATION_ITEM_MENU_IDS.DEL, () => {
+  [CONVERSATION_ITEM_MENU_IDS.DEL, async () => {
     console.log('删除');
   }],
-  [CONVERSATION_ITEM_MENU_IDS.RENAME, () => {
+  [CONVERSATION_ITEM_MENU_IDS.RENAME, async () => {
     console.log('重命名');
   }],
-  [CONVERSATION_ITEM_MENU_IDS.PIN, () => {
-    console.log('置顶');
+  [CONVERSATION_ITEM_MENU_IDS.PIN, async (item: Conversation) => {
+    if (item.pinned) {
+      await conversationsStore.unpinConversation(item.id);
+      return
+    }
+    await conversationsStore.pinConversation(item.id);
   }],
 ]);
 const props = defineProps<{
@@ -29,10 +35,10 @@ const props = defineProps<{
 provide(CTX_KEY, {
   width: computed(() => props.width),
 });
-async function handleItemContextMenu(_item: Conversation) {
+async function handleItemContextMenu(item: Conversation) {
   const clickItem = await createContextMenu(MENU_IDS.CONVERSATION_ITEM, void 0) as CONVERSATION_ITEM_MENU_IDS
   const action = conversationItemActionPolicy.get(clickItem);
-  action && await action?.();
+  action && await action?.(item);
 }
 </script>
 

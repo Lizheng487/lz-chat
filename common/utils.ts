@@ -1,3 +1,6 @@
+import { OpenAISetting } from "./types";
+import { encode, decode } from "js-base64";
+
 // 防抖函数
 export function debounce<T extends (...args: any[]) => any>(
   fn: T,
@@ -49,5 +52,22 @@ export function simpleCloneDeep<T>(obj: T): T {
   } catch (error) {
     console.error("simpleCloneDeep failed:", error);
     return obj;
+  }
+}
+
+export function stringifyOpenAISetting(setting: OpenAISetting) {
+  try {
+    return encode(JSON.stringify(setting));
+  } catch (error) {
+    console.log("stringifyOpenAISetting failed:", error);
+    return "";
+  }
+}
+export function parseOpenAISetting(setting: string): OpenAISetting {
+  try {
+    return JSON.parse(decode(setting));
+  } catch (error) {
+    console.log("parseOpenAISetting failed:", error);
+    return {} as OpenAISetting;
   }
 }
