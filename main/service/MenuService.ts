@@ -1,9 +1,8 @@
 import { ipcMain, Menu, type MenuItemConstructorOptions } from "electron";
 import { IPC_EVENTS } from "@common/constants";
 import { cloneDeep } from "@common/utils";
-import logManager from "./LogService";
 import { createTranslator } from "../utils";
-// Menu.buildFromTemplate();
+import logManager from "./LogService";
 
 let t: ReturnType<typeof createTranslator> = createTranslator();
 
@@ -11,11 +10,13 @@ class MenuService {
   private static _instance: MenuService;
   private _menuTemplates: Map<string, MenuItemConstructorOptions[]> = new Map();
   private _currentMenu?: Menu = void 0;
+
   private constructor() {
     this._setupIpcListener();
     this._setupLanguageChangeListener();
-    logManager.info("MenuService initialized successfully");
+    logManager.info("MenuService initialized successfully.");
   }
+
   private _setupIpcListener() {
     ipcMain.handle(
       IPC_EVENTS.SHOW_CONTEXT_MENU,
@@ -25,29 +26,40 @@ class MenuService {
         )
     );
   }
-  private _setupLanguageChangeListener() {}
+
+  private _setupLanguageChangeListener() {
+    //  :todo
+    // configManager.onConfigChange((config)=> {
+    // if(language changed)
+    // t =
+    // })
+  }
+
   public static getInstance() {
-    if (!this._instance) {
-      this._instance = new MenuService();
-    }
+    if (!this._instance) this._instance = new MenuService();
     return this._instance;
   }
+
   public register(menuId: string, template: MenuItemConstructorOptions[]) {
     this._menuTemplates.set(menuId, template);
     return menuId;
   }
+
   public showMenu(
     menuId: string,
     onClose?: () => void,
     dynamicOptions?: string
   ) {
     if (this._currentMenu) return;
-    const menuTemplate = cloneDeep(this._menuTemplates.get(menuId));
-    if (!menuTemplate) {
-      logManager.warn(`Menu ${menuId} not found`);
+
+    const template = cloneDeep(this._menuTemplates.get(menuId));
+
+    if (!template) {
+      logManager.warn(`Menu ${menuId} not found.`);
       onClose?.();
       return;
     }
+
     let _dynamicOptions: Array<
       Partial<MenuItemConstructorOptions> & { id: string }
     > = [];
@@ -57,9 +69,10 @@ class MenuService {
         : JSON.parse(dynamicOptions ?? "[]");
     } catch (error) {
       logManager.error(
-        `failed to parse dynamic options for menu ${menuId}: ${error}`
+        `Failed to parse dynamicOptions for menu ${menuId}: ${error}`
       );
     }
+
     const translationItem = (
       item: MenuItemConstructorOptions
     ): MenuItemConstructorOptions => {
@@ -77,32 +90,39 @@ class MenuService {
         label: t(item?.label) ?? void 0,
       };
     };
-    const localizedTemplate = menuTemplate.map((item) => {
+    const localizedTemplate = template.map((item) => {
       if (!Array.isArray(_dynamicOptions) || !_dynamicOptions.length) {
         return translationItem(item);
       }
+
       const dynamicItem = _dynamicOptions.find((_item) => _item.id === item.id);
+
       if (dynamicItem) {
         const mergedItem = { ...item, ...dynamicItem };
         return translationItem(mergedItem);
       }
+
       if (item.submenu) {
         return translationItem({
           ...item,
           submenu: (item.submenu as MenuItemConstructorOptions[])?.map(
-            (_item: MenuItemConstructorOptions) => {
+            (__item: MenuItemConstructorOptions) => {
               const dynamicItem = _dynamicOptions.find(
-                (_item) => _item.id === _item.id
+                (_item) => _item.id === __item.id
               );
-              return { ..._item, ...dynamicItem };
+              return { ...__item, ...dynamicItem };
             }
           ),
         });
       }
+
       return translationItem(item);
     });
+
     const menu = Menu.buildFromTemplate(localizedTemplate);
+
     this._currentMenu = menu;
+
     menu.popup({
       callback: () => {
         this._currentMenu = void 0;
@@ -110,13 +130,16 @@ class MenuService {
       },
     });
   }
-  public destoryMenu(menuId: string) {
+
+  public destroyMenu(menuId: string) {
     this._menuTemplates.delete(menuId);
   }
-  public destoryed() {
+
+  public destroyed() {
     this._menuTemplates.clear();
     this._currentMenu = void 0;
   }
 }
+
 export const menuManager = MenuService.getInstance();
 export default menuManager;
