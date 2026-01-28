@@ -5,14 +5,18 @@ import ResizeDivider from '@renderer/components/ResizeDivider.vue';
 import ConversationList from '@renderer/components/ConversationList/index.vue';
 import { initProviders } from './dataBase';
 import { useProvidersStore } from './stores/providers';
+import { useConversationsStore } from './stores/conversations';
+import { logger } from './utils/logger'
 
 const sidebarWidth = ref(320);
-const providersStore = useProvidersStore();
+const { initialize: initializeProvidersStore } = useProvidersStore();
+const { initialize: initializeConversationsStore } = useConversationsStore();
 
 onMounted(async () => {
   await initProviders();
-  await providersStore.initialize();
-  console.log('App mounted');
+  await initializeProvidersStore();
+  await initializeConversationsStore();
+  logger.info('App mounted');
 });
 </script>
 <template>

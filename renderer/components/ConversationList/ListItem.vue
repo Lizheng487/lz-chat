@@ -2,13 +2,19 @@
 import type { Conversation } from '@common/types'
 import { Icon as IconifyIcon } from '@iconify/vue'
 import ItemTitle from './ItemTitle.vue';
+import { CTX_KEY } from './constants';
 
 const _PIN_ICON_SIZE = 16 as const
 
 defineOptions({ name: 'ConversationListItem' });
 
-defineProps<Conversation>();
+const props = defineProps<Conversation>();
 const emit = defineEmits(['updateTitle']);
+const ctx = inject(CTX_KEY, void 0)
+const isTitleEditable = computed(() => ctx?.editId.value === props.id)
+function updateTitle(title: string) {
+  emit('updateTitle', props.id, title)
+}
 </script>
 
 <template>
@@ -21,6 +27,6 @@ const emit = defineEmits(['updateTitle']);
   </div>
   <div class="w-full flex items-center">
     <!-- 复选框 预留 -->
-    <item-title :title="title"></item-title>
+    <item-title :title="title" :is-editable="isTitleEditable" @update-title="updateTitle"></item-title>
   </div>
 </template>

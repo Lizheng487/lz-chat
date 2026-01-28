@@ -18,8 +18,8 @@ const conversationItemActionPolicy = new Map([
   [CONVERSATION_ITEM_MENU_IDS.DEL, async () => {
     console.log('删除');
   }],
-  [CONVERSATION_ITEM_MENU_IDS.RENAME, async () => {
-    console.log('重命名');
+  [CONVERSATION_ITEM_MENU_IDS.RENAME, async (item: Conversation) => {
+    editId.value = item.id;
   }],
   [CONVERSATION_ITEM_MENU_IDS.PIN, async (item: Conversation) => {
     if (item.pinned) {
@@ -32,9 +32,22 @@ const conversationItemActionPolicy = new Map([
 const props = defineProps<{
   width: number;
 }>();
+const editId = ref<number | void>()
+const checkedIds = ref<number[]>([]);
 provide(CTX_KEY, {
   width: computed(() => props.width),
+  editId: computed(() => editId.value),
+  checkedIds: checkedIds
 });
+function updateTitle(id: number, title: string) {
+  const target = conversationsStore.conversations.find(item => item.id === id);
+  if (!target) return;
+  conversationsStore.updateConversation({
+    ...target,
+    title
+  });
+  editId.value = void 0;
+}
 async function handleItemContextMenu(item: Conversation) {
   const clickItem = await createContextMenu(MENU_IDS.CONVERSATION_ITEM, void 0) as CONVERSATION_ITEM_MENU_IDS
   const action = conversationItemActionPolicy.get(clickItem);
@@ -51,7 +64,7 @@ async function handleItemContextMenu(item: Conversation) {
         <li v-if="item.type !== 'divider'"
           class="cursor-pointer p-2 mt-2 rounded-md hover:bg-input flex flex-col items-start gap-2"
           @contextmenu.prevent.stop="handleItemContextMenu(item)">
-          <list-item v-bind="item" />
+          <list-item v-bind="item" @update-title="updateTitle" />
         </li>
         <li v-else class="divider my-2 h-px bg-input"></li>
       </template>
