@@ -4,16 +4,17 @@ import SearchBar from './SearchBar.vue';
 import ListItem from './ListItem.vue';
 import { CTX_KEY } from './constants';
 import { useContextMenu } from './useContextMenu';
-import { Conversation } from '@common/types';
+import type { Conversation } from '@common/types';
 import { createContextMenu } from '@renderer/utils/contextMenu';
 import { CONVERSATION_ITEM_MENU_IDS, MENU_IDS } from '@common/constants';
 import { useConversationsStore } from '@renderer/stores/conversations';
+import OperationsBar from './OperationsBar.vue';
 
 defineOptions({ name: 'ConversationList' });
 
 const conversationsStore = useConversationsStore();
 const { conversations } = useFilter();
-const { handle: handleListContextMenu } = useContextMenu();
+const { handle: handleListContextMenu, isBatchOperate } = useContextMenu();
 const conversationItemActionPolicy = new Map([
   [CONVERSATION_ITEM_MENU_IDS.DEL, async () => {
     console.log('删除');
@@ -29,11 +30,33 @@ const conversationItemActionPolicy = new Map([
     await conversationsStore.pinConversation(item.id);
   }],
 ]);
+const batchActionPolicy = new Map([
+  [CONVERSATION_ITEM_MENU_IDS.DEL, async () => {
+    console.log('删除');
+  }],
+  [CONVERSATION_ITEM_MENU_IDS.PIN, async () => {
+    checkedIds.value.forEach(id => {
+      if (conversationsStore.allConversations.find(item => item.id === id)?.pinned) {
+        conversationsStore.unpinConversation(id);
+        return
+      }
+      conversationsStore.pinConversation(id);
+    })
+    isBatchOperate.value = false
+  }]
+])
 const props = defineProps<{
   width: number;
 }>();
 const editId = ref<number | void>()
 const checkedIds = ref<number[]>([]);
+function handleAllSelectChange(checked: boolean) {
+  checkedIds.value = checked ? conversations.value.map(item => item.id) : []
+}
+function handleBatchOperate(opId: CONVERSATION_ITEM_MENU_IDS) {
+  const action = batchActionPolicy.get(opId);
+  action && action();
+}
 provide(CTX_KEY, {
   width: computed(() => props.width),
   editId: computed(() => editId.value),
@@ -69,5 +92,7 @@ async function handleItemContextMenu(item: Conversation) {
         <li v-else class="divider my-2 h-px bg-input"></li>
       </template>
     </ul>
+    <operations-bar v-show="isBatchOperate" @select-all="handleAllSelectChange" @cancel="isBatchOperate = false"
+      @op="handleBatchOperate" />
   </div>
 </template>
