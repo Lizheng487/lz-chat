@@ -1,4 +1,15 @@
 type ThemeMode = "light" | "dark" | "system";
+
+interface CreateDialogProps {
+  winId?: string;
+  title?: string;
+  content?: string;
+  confirmText?: string;
+  cancelText?: string;
+  ismodal?: boolean;
+  onConfirm?: () => void;
+  onCancel?: () => void;
+}
 interface WindowApi {
   closeWindow: () => void;
   isWindowMaximized: () => Promise<boolean>;
@@ -12,6 +23,10 @@ interface WindowApi {
   showContextMenu: (menuId: string, dynamicOptions?: string) => Promise<any>;
   contextMenuItemClick: (menuId: string, cb: (id: string) => void) => void;
   removeContextMenuListener: (menuId: string) => void;
+  viewIsReady: () => void;
+  createDialog: (params: CreateDialogProps) => Promise<string>;
+  _dialogFeedback: (val: "cancel" | "confirm", winId: number) => void;
+  _dialogGetParams: () => Promise<CreateDialogProps>;
   logger: {
     debug: (message: string, ...meta: any[]) => void;
     info: (message: string, ...meta: any[]) => void;

@@ -1,4 +1,5 @@
 export enum IPC_EVENTS {
+  OPEN_WINDOW = "open-window",
   CLOSE_WINDOW = "close-window",
   MINIMIZE_WINDOW = "minimize-window",
   MAXIMIZE_WINDOW = "maximize-window",

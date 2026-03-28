@@ -9,14 +9,28 @@ import { createContextMenu } from '@renderer/utils/contextMenu';
 import { CONVERSATION_ITEM_MENU_IDS, MENU_IDS } from '@common/constants';
 import { useConversationsStore } from '@renderer/stores/conversations';
 import OperationsBar from './OperationsBar.vue';
+import { useDialog } from '@renderer/hooks/useDialog';
 
 defineOptions({ name: 'ConversationList' });
 
+const { createDialog } = useDialog();
+const router = useRouter();
+const route = useRoute();
+const currentId = computed(() => Number(route.query.id));
 const conversationsStore = useConversationsStore();
 const { conversations } = useFilter();
 const { handle: handleListContextMenu, isBatchOperate } = useContextMenu();
 const conversationItemActionPolicy = new Map([
-  [CONVERSATION_ITEM_MENU_IDS.DEL, async () => {
+  [CONVERSATION_ITEM_MENU_IDS.DEL, async (item: Conversation) => {
+    const res = await createDialog({
+      title: 'main.conversation.dialog.title',
+      content: 'main.conversation.dialog.content',
+    });
+    if (res === 'confirm') {
+      conversationsStore.delConversation(item.id);
+      item.id === currentId.value && router.push('/conversation');
+
+    }
     console.log('删除');
   }],
   [CONVERSATION_ITEM_MENU_IDS.RENAME, async (item: Conversation) => {
@@ -32,7 +46,16 @@ const conversationItemActionPolicy = new Map([
 ]);
 const batchActionPolicy = new Map([
   [CONVERSATION_ITEM_MENU_IDS.DEL, async () => {
-    console.log('删除');
+    const res = await createDialog({
+      title: 'main.conversation.dialog.title',
+      content: 'main.conversation.dialog.content_1',
+    });
+    if (res !== 'confirm') return
+    if (checkedIds.value.includes(currentId.value)) {
+      router.push('/conversation');
+    }
+    checkedIds.value.forEach(id => conversationsStore.delConversation(id))
+    isBatchOperate.value = false
   }],
   [CONVERSATION_ITEM_MENU_IDS.PIN, async () => {
     checkedIds.value.forEach(id => {

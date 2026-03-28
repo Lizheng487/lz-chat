@@ -22,7 +22,6 @@ interface SizeOptions {
   maxHeight?: number;
 }
 const SHARED_WINDOW_OPTIONS = {
-  opacity: 0,
   show: false,
   titleBarStyle: "hidden",
   title: "LzChat",
@@ -92,7 +91,7 @@ class WindowService {
   ) {
     if (this.get(name)) return;
     const isHiddenWin = this._isHiddenWin(name);
-    let window = this._createWinInstance(name, moreOpts);
+    let window = this._createWinInstance(name, { ...size, ...moreOpts });
     !isHiddenWin &&
       this._setupWinLifecycle(window, name)._loadWindowTemplate(window, name);
     this._listenWinReady({
