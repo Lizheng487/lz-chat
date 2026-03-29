@@ -7,7 +7,7 @@
   },
   "main": {
     "welcome": {
-      "helloMessage": "你好，我是诺艾尔"
+      "helloMessage": "LzChat，开启AI对话"
     },
     "conversation": {
       "placeholder": "输入消息...",
