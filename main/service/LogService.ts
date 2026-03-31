@@ -111,6 +111,37 @@ class LogService {
   public error(message: string, ...meta: any[]): void {
     log.error(message, ...meta);
   }
+  public logApiRequest(
+    endpoint: string,
+    data: any = {},
+    method: string = "POST"
+  ): void {
+    this.info(
+      `API Request: ${endpoint} called,Method:${method} with,request:${JSON.stringify(
+        data
+      )}`
+    );
+  }
+  public logApiResponse(
+    endpoint: string,
+    response: any = {},
+    statusCode: number = 200,
+    responseTime: number = 0
+  ): void {
+    if (statusCode >= 400) {
+      this.error(
+        `API endpoint: ${endpoint} failed with status code ${statusCode} and response time ${responseTime}ms,response:${JSON.stringify(
+          response
+        )}`
+      );
+    } else {
+      this.debug(
+        `API endpoint: ${endpoint} succeeded with status code ${statusCode} and response time ${responseTime}ms,response:${JSON.stringify(
+          response
+        )}`
+      );
+    }
+  }
   public logUserOperation(
     operation: string,
     userId: string = "unknown",

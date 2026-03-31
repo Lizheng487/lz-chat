@@ -8,7 +8,7 @@ export const providers: Provider[] = [
     id: 1,
     name: "bigmodel",
     title: "智谱AI",
-    models: ["glm-4.5-flash"],
+    models: ["glm-4.7-flash"],
     openAISetting: stringifyOpenAISetting({
       baseURL: "https://open.bigmodel.cn/api/paas/v4",
       apiKey: "",

@@ -8,8 +8,13 @@ import MessageInput from '@renderer/components/MessageInput.vue';
 import MessageList from '@renderer/components/MessageList.vue';
 import CreateConversation from '@renderer/components/CreateConversation.vue';
 import { useMessagesStore } from '@renderer/stores/messages';
+import { useConversationsStore } from '@renderer/stores/conversations';
+import { useProvidersStore } from '@renderer/stores/providers';
 
-import { messages } from '@renderer/testData';
+// import { messages } from '@renderer/testData';
+
+const conversationsStore = useConversationsStore();
+const providersStore = useProvidersStore();
 
 const messagesStore = useMessagesStore();
 const listHeight = ref(0);
@@ -32,11 +37,16 @@ async function handleCreateConversation(create: (title: string) => Promise<numbe
   afterCreateConversation(id, _message);
 }
 
-function afterCreateConversation(id: number, _firstMsg: string) {
+function afterCreateConversation(id: number, firstMsg: string) {
   if (!id) return;
   router.push(`/conversation/${id}`);
-  // TODO: 第一条消息
+  messagesStore.sendMessage({
+    type: 'question',
+    content: firstMsg,
+    conversationId:id
+  });
   message.value = '';
+  // conversationsStore
 }
 
 
@@ -77,7 +87,7 @@ watch(() => listHeight.value, () => listScale.value = listHeight.value / window.
   </div>
   <div class="h-full flex flex-col" v-else>
     <div class="w-full min-h-0" :style="{ height: `${listHeight}px` }">
-      <message-list :messages="messages" />
+      <message-list :messages="messagesStore.messagesByConversationId(conversationId)" />
     </div>
     <div class="input-container bg-bubble-others flex-auto w-[calc(100% + 10px)] ml-[-5px] ">
       <resize-divider direction="horizontal" v-model:size="listHeight" :max-size="maxListHeight" :min-size="100" />

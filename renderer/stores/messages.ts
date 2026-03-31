@@ -4,9 +4,15 @@ import { dataBase } from "../dataBase";
 import { uniqueByKey } from "@common/utils";
 import { useConversationsStore } from "./conversations";
 import { cloneDeep } from "lodash";
+import { useProvidersStore } from "./providers";
+import { listenDialogueBack } from "../utils/dialogue";
+
+const msgContentMap = new Map<number, string>();
+export const stopMethods = new Map<number, () => void>();
 
 export const useMessagesStore = defineStore("messages", () => {
   const conversationsStore = useConversationsStore();
+  const providersStore = useProvidersStore();
   // states
   const messages = ref<Message[]>([]);
 
@@ -46,7 +52,65 @@ export const useMessagesStore = defineStore("messages", () => {
   }
   async function sendMessage(message: Omit<Message, "id" | "createdAt">) {
     await addMessage(message);
-    // TODO: 调用 大模型
+    const loadingMsgId = await addMessage({
+      conversationId: message.conversationId,
+      content: "",
+      type: "answer",
+      status: "loading",
+    });
+    const conversation = conversationsStore.getConversationById(
+      message.conversationId
+    );
+    if (!conversation) return loadingMsgId;
+    const provider = providersStore.allProviders.find(
+      (item) => item.id === conversation.providerId
+    );
+    if (!provider) return loadingMsgId;
+    msgContentMap.set(loadingMsgId, "");
+    let streamCallback:
+      | ((stream: DialogueBackStream) => Promise<void>)
+      | void = async (stream) => {
+      const { data, messageId } = stream;
+      const getStatus = (data: DialogueBackStream["data"]): MessageStatus => {
+        if (data.isError) return "error";
+        if (data.isEnd) return "success";
+        return "streaming";
+      };
+      msgContentMap.set(messageId, msgContentMap.get(messageId) + data.result);
+      const _update = {
+        content: msgContentMap.get(messageId) || "",
+        status: getStatus(data),
+        updatedAt: Date.now(),
+      } as Message;
+      await nextTick();
+      updateMessage(messageId, _update);
+      if (data.isEnd) {
+        msgContentMap.delete(messageId);
+        streamCallback = void 0;
+      }
+    };
+    stopMethods.set(
+      loadingMsgId,
+      listenDialogueBack(streamCallback, loadingMsgId)
+    );
+    const messages = messagesByConversationId
+      .value(message.conversationId)
+      .filter((item) => item.status !== "loading")
+      .map((item) => ({
+        role:
+          item.type === "question"
+            ? "user"
+            : ("assistant" as DialogueMessageRole),
+        content: item.content,
+      }));
+    await window.api.startADialogue({
+      messageId: loadingMsgId,
+      providerName: provider.name,
+      selectedModel: conversation.selectedModel,
+      conversationId: message.conversationId,
+      messages,
+    });
+    return loadingMsgId;
   }
   async function updateMessage(id: number, updates: Partial<Message>) {
     let currentMsg = cloneDeep(
