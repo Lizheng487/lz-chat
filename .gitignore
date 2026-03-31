@@ -90,3 +90,6 @@ typings/
 
 # Electron-Forge
 out/
+
+# AIconfig ApiKey
+main/providers/index.ts
