@@ -7,6 +7,8 @@ import { cloneDeep } from "lodash";
 import { useProvidersStore } from "./providers";
 import { listenDialogueBack } from "../utils/dialogue";
 
+import i18n from "../i18n";
+
 const msgContentMap = new Map<number, string>();
 export const stopMethods = new Map<number, () => void>();
 
@@ -15,8 +17,13 @@ export const useMessagesStore = defineStore("messages", () => {
   const providersStore = useProvidersStore();
   // states
   const messages = ref<Message[]>([]);
+  const messagesInputValue = ref(new Map());
 
   // getters
+  const messageInputValueById = computed(
+    () => (conversationId: number) =>
+      messagesInputValue.value.get(conversationId) ?? ""
+  );
   const allMessages = computed(() => messages.value);
   const messagesByConversationId = computed(
     () => (conversationId: number) =>
@@ -24,7 +31,16 @@ export const useMessagesStore = defineStore("messages", () => {
         .filter((message) => message.conversationId === conversationId)
         .sort((a, b) => a.createdAt - b.createdAt)
   );
-
+  const loadingMsgIdsByConversationId = computed(
+    () => (conversationId: number) =>
+      messagesByConversationId
+        .value(conversationId)
+        .filter(
+          (message) =>
+            message.status === "loading" || message.status === "streaming"
+        )
+        .map((message) => message.id)
+  );
   // actions
   async function initialize(conversationId: number) {
     if (!conversationId) return;
@@ -35,6 +51,9 @@ export const useMessagesStore = defineStore("messages", () => {
     if (isConversationLoaded) return;
     const saved = await dataBase.messages.where({ conversationId }).toArray();
     messages.value = uniqueByKey([...messages.value, ...saved], "id");
+  }
+  function setMessageInputValue(conversationId: number, value: string) {
+    messagesInputValue.value.set(conversationId, value);
   }
   const _updateConversation = async (conversationId: number) => {
     const conversation = await dataBase.conversations.get(conversationId);
@@ -112,6 +131,22 @@ export const useMessagesStore = defineStore("messages", () => {
     });
     return loadingMsgId;
   }
+  async function stopMessage(id: number, update: boolean = true) {
+    const stop = stopMethods.get(id);
+    stop && stop?.();
+    if (update) {
+      const msgContent =
+        messages.value.find((message) => message.id === id)?.content || "";
+      await updateMessage(id, {
+        content: msgContent
+          ? msgContent + i18n.global.t("main.message.stoppedGeneration")
+          : void 0,
+        status: "success",
+        updatedAt: Date.now(),
+      });
+    }
+    stopMethods.delete(id);
+  }
   async function updateMessage(id: number, updates: Partial<Message>) {
     let currentMsg = cloneDeep(
       messages.value.find((message) => message.id === id)
@@ -123,7 +158,7 @@ export const useMessagesStore = defineStore("messages", () => {
   }
   async function deleteMessage(id: number) {
     let currentMsg = cloneDeep(messages.value.find((item) => item.id === id));
-    //TODO: stopMessage(id, false);
+    stopMessage(id, false);
     await dataBase.messages.delete(id);
     currentMsg && _updateConversation(currentMsg.conversationId);
     // 从响应式数组中移除
@@ -134,6 +169,10 @@ export const useMessagesStore = defineStore("messages", () => {
     messages,
     allMessages,
     messagesByConversationId,
+    messageInputValueById,
+    loadingMsgIdsByConversationId,
+    stopMessage,
+    setMessageInputValue,
     initialize,
     addMessage,
     sendMessage,
