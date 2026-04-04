@@ -10,6 +10,11 @@ import App from "../renderer/App.vue";
 
 import TitleBar from "./components/TitleBar.vue";
 import DragRegion from "./components/DragRegion.vue";
+
+import hljs from "highlight.js/lib/core";
+import xml from "highlight.js/lib/languages/xml";
+
+hljs.registerLanguage("vue", xml);
 const components: Plugin = function (app) {
   app.component("TitleBar", TitleBar);
   app.component("DragRegion", DragRegion);
