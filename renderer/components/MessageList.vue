@@ -2,13 +2,53 @@
 import type { Message } from '@common/types';
 import { NScrollbar } from 'naive-ui'
 import MessageRender from './MessageRender.vue';
+import { useBatchTimeAgo } from '@renderer/hooks/useTimeAgo';
 
+const { formatTimeAgo } = useBatchTimeAgo();
+
+
+const MESSAGE_LIST_CLASS_NAME = 'message-list';
+const SCROLLBAR_CONTENT_CLASS_NAME = 'n-scrollbar-content';
+
+const route = useRoute();
 defineOptions({
   name: 'MessageList',
 });
-defineProps<{
+const props = defineProps<{
   messages: Message[];
 }>();
+function _getScrollDOM() {
+  const msgListDom = document.getElementsByClassName(MESSAGE_LIST_CLASS_NAME)[0];
+  if (!msgListDom) return
+  return msgListDom.getElementsByClassName(SCROLLBAR_CONTENT_CLASS_NAME)[0];
+}
+async function scrollToBottom(behavior: ScrollIntoViewOptions['behavior'] = 'smooth') {
+  await nextTick();
+  const scrollDOM = _getScrollDOM();
+  if (!scrollDOM) return;
+  scrollDOM.scrollIntoView({
+    behavior,
+    block: 'end',
+  })
+}
+let currentHeight = 0;
+watch([() => route.params.id, () => props.messages.length], () => {
+  scrollToBottom('instant');
+  currentHeight = 0
+
+})
+watch(() => props.messages[props.messages.length - 1]?.content?.length, () => {
+  const scrollDOM = _getScrollDOM();
+  if (!scrollDOM) return;
+  const height = scrollDOM.scrollHeight
+  if (height > currentHeight) {
+    currentHeight = height
+    scrollToBottom();
+  }
+}, { immediate: true, deep: true })
+onMounted(() => {
+  scrollToBottom('instant');
+})
 </script>
 <template>
   <div class="flex flex-col h-full">
@@ -22,8 +62,7 @@ defineProps<{
           <span>
             <div class="text-sm text-gray-500 mb-2"
               :style="{ textAlign: message.type === 'question' ? 'end' : 'start' }">
-              <!-- TODO: timeAgo -->
-              {{ message.createdAt }}
+              {{ formatTimeAgo(message.createdAt) }}
             </div>
             <div class="msg-shadow p-2 rounded-md bg-bubble-self text-white" v-if="message.type === 'question'">
               <message-render :msg-id="message.id" :content="message.content"
