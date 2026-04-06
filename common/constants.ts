@@ -19,11 +19,21 @@ export enum IPC_EVENTS {
   LOG_WARN = "log-warn",
   LOG_FATAL = "log-fatal",
   THEME_MODE_UPDATED = "theme-mode-updated",
+  CONFIG_UPDATED = "config-updated",
 }
 export enum WINDOW_NAMES {
   MAIN = "main",
   SETTING = "setting",
   DIALOG = "dialog",
+}
+export enum CONFIG_KEYS {
+  THEME_MODE = "themeMode",
+  PRIMARY_COLOR = "primaryColor",
+  LANGUAGE = "language",
+  FONT_SIZE = "fontSize",
+  MINIMIZE_TO_TRAY = "minimizeToTray",
+  PROVIDER = "provider",
+  DEFAULT_MODEL = "defaultModel",
 }
 export const MAIN_WIN_SIZE = {
   width: 1024,
