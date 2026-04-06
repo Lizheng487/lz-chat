@@ -17,6 +17,10 @@ const _findLastElement = (target: HTMLElement): Element | void => {
   const isList = (el: Element) => el.tagName === 'OL' || el.tagName === 'UL'
   if (!target) return;
   let lastElement: Element | void = target.lastElementChild ?? target;
+
+  if (lastElement && lastElement.tagName === 'PRE')
+    lastElement = lastElement.getElementsByClassName('hljs')[0] ?? lastElement
+
   if (lastElement && isList(lastElement)) {
     lastElement = _findLastElement(lastElement as HTMLElement);
   }

@@ -7,6 +7,9 @@ export enum IPC_EVENTS {
   SET_THEME_MODE = "set-theme-mode",
   GET_THEME_MODE = "get-theme-mode",
   IS_DARK_THEME = "is-dark-theme",
+  SET_CONFIG = "set-config",
+  GET_CONFIG = "get-config",
+  UPDATE_CONFIG = "update-config",
   RENDERER_IS_READY = "renderer-is-ready",
   SHOW_CONTEXT_MENU = "show-context-menu",
   START_A_DIALOGUE = "start-a-dialogue",
@@ -48,4 +51,9 @@ export enum CONVERSATION_LIST_MENU_IDS {
   SORT_ASCENDING = "sort-ascending",
   SORT_DESCENDING = "sort-descending",
   BATCH_OPERATIONS = "batch-operations",
+}
+export enum MESSAGE_ITEM_MENU_IDS {
+  COPY = "copy",
+  DELETE = "delete",
+  SELECT = "select",
 }
