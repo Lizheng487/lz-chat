@@ -9,9 +9,10 @@ import {
 import path from "node:path";
 import type { WindowNames } from "@common/types";
 import { debounce } from "@common/utils";
-import { IPC_EVENTS, WINDOW_NAMES } from "@common/constants";
+import { CONFIG_KEYS, IPC_EVENTS, WINDOW_NAMES } from "@common/constants";
 import logManager from "./LogService";
 import themeManager from "./ThemeService";
+import configManager from "./ConfigService";
 
 interface SizeOptions {
   width: number;
@@ -54,7 +55,8 @@ class WindowService {
     logManager.info("WindowService initialized successfully.");
   }
   private _isReallyClose(windowName: WindowNames | void) {
-    if (windowName === WINDOW_NAMES.MAIN) return true;
+    if (windowName === WINDOW_NAMES.MAIN)
+      return configManager.get(CONFIG_KEYS.MINIMIZE_TO_TRAY) === false;
     if (windowName === WINDOW_NAMES.SETTING) return false;
     return true;
   }
@@ -260,7 +262,7 @@ class WindowService {
         win?.instance?.close?.()
       );
     }
-    const minimizeToTray = false;
+    const minimizeToTray = configManager.get(CONFIG_KEYS.MINIMIZE_TO_TRAY);
     if (!minimizeToTray && !this.get(WINDOW_NAMES.MAIN)?.isVisible()) {
       return Object.values(this._winStates).forEach(
         (win) => !win?.instance?.isVisible() && win?.instance?.close?.()

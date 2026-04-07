@@ -7,11 +7,23 @@ import {
   CONVERSATION_ITEM_MENU_IDS,
   CONVERSATION_LIST_MENU_IDS,
   MESSAGE_ITEM_MENU_IDS,
+  CONFIG_KEYS,
 } from "@common/constants";
 import { windowManager } from "../service/WindowService";
 import { menuManager } from "../service/MenuService";
 import { logManager } from "../service/LogService";
 import { createProvider } from "../providers";
+import configManager from "../service/ConfigService";
+import trayManager from "@main/service/TrayService";
+
+const handleTray = (minimizeToTray: boolean) => {
+  if (minimizeToTray) {
+    trayManager.create();
+    return;
+  } else {
+    trayManager.destroy();
+  }
+};
 const registerMenus = (window: BrowserWindow) => {
   const conversationItemMenuItemClick = (id: string) => {
     logManager.logUserOperation(
@@ -168,6 +180,13 @@ const registerMenus = (window: BrowserWindow) => {
 };
 export function setupMainWindow() {
   windowManager.onWindowCreate(WINDOW_NAMES.MAIN, (mainWindow) => {
+    let minimizeToTray = configManager.get(CONFIG_KEYS.MINIMIZE_TO_TRAY);
+    configManager.onConfigChange((config) => {
+      if (minimizeToTray === config[CONFIG_KEYS.MINIMIZE_TO_TRAY]) return;
+      minimizeToTray = config[CONFIG_KEYS.MINIMIZE_TO_TRAY];
+      handleTray(minimizeToTray);
+    });
+    handleTray(minimizeToTray);
     registerMenus(mainWindow);
   });
   windowManager.create(WINDOW_NAMES.MAIN, MAIN_WIN_SIZE);

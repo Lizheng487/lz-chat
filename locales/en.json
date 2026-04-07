@@ -116,7 +116,7 @@
     }
   },
   "tray": {
-    "tooltip": "Noelle Application",
+    "tooltip": "LzChat",
     "showWindow": "Show Window",
     "exit": "Exit"
   },

@@ -1,8 +1,9 @@
 import { ipcMain, Menu, type MenuItemConstructorOptions } from "electron";
-import { IPC_EVENTS } from "@common/constants";
+import { CONFIG_KEYS, IPC_EVENTS } from "@common/constants";
 import { cloneDeep } from "@common/utils";
 import { createTranslator } from "../utils";
 import logManager from "./LogService";
+import configManager from "./ConfigService";
 
 let t: ReturnType<typeof createTranslator> = createTranslator();
 
@@ -28,11 +29,10 @@ class MenuService {
   }
 
   private _setupLanguageChangeListener() {
-    //  :todo
-    // configManager.onConfigChange((config)=> {
-    // if(language changed)
-    // t =
-    // })
+    configManager.onConfigChange((config) => {
+      if (!config[CONFIG_KEYS.LANGUAGE]) return;
+      t = createTranslator();
+    });
   }
 
   public static getInstance() {
