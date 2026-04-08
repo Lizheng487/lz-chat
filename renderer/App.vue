@@ -7,11 +7,12 @@ import { initProviders } from './dataBase';
 import { useProvidersStore } from './stores/providers';
 import { useConversationsStore } from './stores/conversations';
 import { logger } from './utils/logger'
+import { useConfig } from '@renderer/hooks/useConfig';
 
 const sidebarWidth = ref(320);
 const { initialize: initializeProvidersStore } = useProvidersStore();
 const { initialize: initializeConversationsStore } = useConversationsStore();
-
+useConfig();
 onMounted(async () => {
   await initProviders();
   await initializeProvidersStore();
