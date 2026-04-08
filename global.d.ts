@@ -30,7 +30,10 @@ interface DialogueBackStream {
   messageId: number;
   data: UniversalChunk & { isError?: boolean };
 }
+type WindowNames = 'main' | 'setting' | 'dialog';
+
 interface WindowApi {
+  openWindow: (name: WindowNames) => void;
   closeWindow: () => void;
   isWindowMaximized: () => Promise<boolean>;
   maximizeWindow: () => void;

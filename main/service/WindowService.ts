@@ -13,6 +13,7 @@ import { CONFIG_KEYS, IPC_EVENTS, WINDOW_NAMES } from "@common/constants";
 import logManager from "./LogService";
 import themeManager from "./ThemeService";
 import configManager from "./ConfigService";
+import { createLogo } from "../utils";
 
 interface SizeOptions {
   width: number;
@@ -45,6 +46,8 @@ interface WindowState {
 }
 class WindowService {
   private static _instance: WindowService;
+  private _logo = createLogo();
+
   private _winStates: Record<WindowNames | string, WindowState> = {
     main: { instance: void 0, isHidden: false, onCreate: [], onClosed: [] },
     setting: { instance: void 0, isHidden: false, onCreate: [], onClosed: [] },
@@ -183,6 +186,7 @@ class WindowService {
       ? (this._winStates[name].instance as BrowserWindow)
       : new BrowserWindow({
           ...SHARED_WINDOW_OPTIONS,
+          icon: this._logo,
           ...opts,
         });
   }
@@ -268,6 +272,17 @@ class WindowService {
         (win) => !win?.instance?.isVisible() && win?.instance?.close?.()
       );
     }
+  }
+  public focus(target: BrowserWindow | void | null) {
+    if (!target) return;
+    const name = this.getName(target);
+    if (target?.isMaximized()) {
+      target?.restore();
+      logManager.debug(`Window ${name} restored and focused`);
+    } else {
+      logManager.debug(`Window ${name} focused`);
+    }
+    target?.focus();
   }
   public close(target: BrowserWindow | void | null, really: boolean = true) {
     if (!target) return;
