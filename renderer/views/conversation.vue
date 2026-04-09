@@ -9,12 +9,12 @@ import MessageList from '@renderer/components/MessageList.vue';
 import CreateConversation from '@renderer/components/CreateConversation.vue';
 import { useMessagesStore } from '@renderer/stores/messages';
 import { useConversationsStore } from '@renderer/stores/conversations';
-import { useProvidersStore } from '@renderer/stores/providers';
+// import { useProvidersStore } from '@renderer/stores/providers';
 
 // import { messages } from '@renderer/testData';
 
 const conversationsStore = useConversationsStore();
-const providersStore = useProvidersStore();
+// const providersStore = useProvidersStore();
 
 const messagesStore = useMessagesStore();
 const listHeight = ref(0);

@@ -1,7 +1,13 @@
 <script setup lang="ts">
-import { NConfigProvider, NMessageProvider, NForm, NFormItem, NSelect, NColorPicker, NSwitch, NTabs, NTabPane, NScrollbar, type FormInst } from 'naive-ui';
+import { NConfigProvider, NMessageProvider, NForm, NFormItem, NSelect, NColorPicker, NSwitch, NTabs, NTabPane, NScrollbar } from 'naive-ui';
 import { useConfig } from '@renderer/hooks/useConfig';
+import { useNaiveTheme } from '@renderer/hooks/useNaiveTheme';
+import { useNaiveLocale } from '@renderer/hooks/useNaiveLocale';
+import { useFontSize } from '@renderer/hooks/useFontSize';
 
+useFontSize();
+const { theme, themeOverrides } = useNaiveTheme();
+const { locale, dateLocale } = useNaiveLocale();
 const activeTab = ref('basic');
 const formModel = useConfig()
 const languageOptions = [
@@ -38,7 +44,8 @@ function onWindowClose() {
 
 </script>
 <template>
-  <n-config-provider class="bg-main text-tx-primary h-screen flex flex-col">
+  <n-config-provider class="bg-main text-tx-primary h-screen flex flex-col" :locale="locale" :date-locale="dateLocale"
+    :theme="theme" :theme-overrides="themeOverrides">
     <n-message-provider>
       <title-bar :is-maximizable="false" @close="onWindowClose">
         <drag-region class="p-2 text-[16px]">{{ t('settings.title') }}</drag-region>

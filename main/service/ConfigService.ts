@@ -34,9 +34,10 @@ export class ConfigService {
   private _setupIpcEvents() {
     const duration = 1000;
     const handleUpdate = debounce((val) => this.update(val), duration);
+    const handleSet = debounce((key, value) => this.set(key, value), duration);
 
     ipcMain.handle(IPC_EVENTS.GET_CONFIG, (_, key) => this.get(key));
-    ipcMain.on(IPC_EVENTS.SET_CONFIG, (_, key, value) => this.set(key, value));
+    ipcMain.on(IPC_EVENTS.SET_CONFIG, (_, key, value) => handleSet(key, value));
     ipcMain.on(IPC_EVENTS.UPDATE_CONFIG, (_, updates) => handleUpdate(updates));
   }
   public static getInstance(): ConfigService {
