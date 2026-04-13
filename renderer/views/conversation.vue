@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { SelectValue } from '@renderer/types';
-import { MAIN_WIN_SIZE } from '@common/constants';
+import { MAIN_WIN_SIZE, CONFIG_KEYS } from '@common/constants';
 import { throttle } from '@common/utils';
 
 import ResizeDivider from '@renderer/components/ResizeDivider.vue';
@@ -9,12 +9,14 @@ import MessageList from '@renderer/components/MessageList.vue';
 import CreateConversation from '@renderer/components/CreateConversation.vue';
 import { useMessagesStore } from '@renderer/stores/messages';
 import { useConversationsStore } from '@renderer/stores/conversations';
-// import { useProvidersStore } from '@renderer/stores/providers';
+import { useProvidersStore } from '@renderer/stores/providers';
+import { useConfig } from '@renderer/hooks/useConfig';
 
 // import { messages } from '@renderer/testData';
 
 const conversationsStore = useConversationsStore();
-// const providersStore = useProvidersStore();
+const providersStore = useProvidersStore();
+const config = useConfig();
 
 const messagesStore = useMessagesStore();
 const listHeight = ref(0);
@@ -28,6 +30,17 @@ const msgInputRef = useTemplateRef<{ selectedProvider: SelectValue }>('msgInputR
 const route = useRoute();
 const router = useRouter();
 
+const defaultModel = computed(() => {
+  const vals: string[] = [];
+  providersStore.allProviders.forEach(provider => {
+    if (!provider.visible) return;
+    provider.models.forEach(model => {
+      vals.push(`${provider.id}:${model}`)
+    })
+  })
+  if (!vals.includes(config[CONFIG_KEYS.DEFAULT_MODEL] ?? '')) return null
+  return config[CONFIG_KEYS.DEFAULT_MODEL] || null;
+})
 const conversationId = computed(() => Number(route.params.id) as number | undefined);
 const providerId = computed(() => ((provider.value as string)?.split(':')[0] ?? ''))
 const selectedModel = computed(() => ((provider.value as string)?.split(':')[1] ?? ''))
@@ -109,6 +122,7 @@ onBeforeRouteUpdate(async (to, from, next) => {
 watch(() => listHeight.value, () => listScale.value = listHeight.value / window.innerHeight)
 watch([() => conversationId.value, () => msgInputRef.value], async ([id, msgInput]) => {
   if (!msgInput || !id) {
+    provider.value = defaultModel.value
     return
   }
   const current = conversationsStore.getConversationById(id)

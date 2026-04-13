@@ -30,11 +30,11 @@ export const providers: Provider[] = [
   },
   {
     id: 3,
-    name: "siliconflow",
-    title: "硅基流动",
-    models: ["Qwen/Qwen3-8B", "deepseek-ai/DeepSeek-R1-0528-Qwen3-8B"],
+    name: "ChatGPT",
+    title: "ChatGPT",
+    models: ["gpt-4.1", "gpt-4.1-mini"],
     openAISetting: stringifyOpenAISetting({
-      baseURL: "https://api.siliconflow.cn/v1",
+      baseURL: "https://api.openai.com/v1",
       apiKey: "",
     }),
     createdAt: new Date().getTime(),
@@ -42,11 +42,11 @@ export const providers: Provider[] = [
   },
   {
     id: 4,
-    name: "qianfan",
-    title: "百度千帆",
-    models: ["ernie-speed-128k", "ernie-4.0-8k", "ernie-3.5-8k"],
+    name: "Claude",
+    title: "Claude",
+    models: ["claude-opus-4-6", "claude-sonnet-4-6"],
     openAISetting: stringifyOpenAISetting({
-      baseURL: "https://qianfan.baidubce.com/v2",
+      baseURL: "https://api.anthropic.com/v1",
       apiKey: "",
     }),
     createdAt: new Date().getTime(),
