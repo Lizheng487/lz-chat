@@ -4,7 +4,8 @@ import { contextBridge, ipcRenderer } from "electron";
 import { IPC_EVENTS, WINDOW_NAMES } from "@common/constants";
 
 const api: WindowApi = {
-  openWindow: (name: WindowNames) => ipcRenderer.send(`${IPC_EVENTS.OPEN_WINDOW}:${name}`),
+  openWindow: (name: WindowNames) =>
+    ipcRenderer.send(`${IPC_EVENTS.OPEN_WINDOW}:${name}`),
   closeWindow: () => ipcRenderer.send(IPC_EVENTS.CLOSE_WINDOW),
   minimizeWindow: () => ipcRenderer.send(IPC_EVENTS.MINIMIZE_WINDOW),
   maximizeWindow: () => ipcRenderer.send(IPC_EVENTS.MAXIMIZE_WINDOW),
@@ -31,14 +32,17 @@ const api: WindowApi = {
     ipcRenderer.removeAllListeners(`${IPC_EVENTS.SHOW_CONTEXT_MENU}:${menuId}`),
   viewIsReady: () => ipcRenderer.send(IPC_EVENTS.RENDERER_IS_READY),
   getConfig: (key: string) => ipcRenderer.invoke(IPC_EVENTS.GET_CONFIG, key),
-  setConfig: (key: string, value: any) => ipcRenderer.send(IPC_EVENTS.SET_CONFIG, key, value),
-  updateConfig: (value: any) => ipcRenderer.send(IPC_EVENTS.UPDATE_CONFIG, value),
+  setConfig: (key: string, value: any) =>
+    ipcRenderer.send(IPC_EVENTS.SET_CONFIG, key, value),
+  updateConfig: (value: any) =>
+    ipcRenderer.send(IPC_EVENTS.UPDATE_CONFIG, value),
   onConfigChange: (callback: (config: any) => void) => {
     ipcRenderer.on(IPC_EVENTS.CONFIG_UPDATED, (_, config) => callback(config));
-    return () => ipcRenderer.removeListener(IPC_EVENTS.CONFIG_UPDATED, callback);
+    return () =>
+      ipcRenderer.removeListener(IPC_EVENTS.CONFIG_UPDATED, callback);
   },
-  removeConfigChangeListener: (cb: (config: any) => void) => ipcRenderer.removeListener(IPC_EVENTS.CONFIG_UPDATED, cb),
-  
+  removeConfigChangeListener: (cb: (config: any) => void) =>
+    ipcRenderer.removeListener(IPC_EVENTS.CONFIG_UPDATED, cb),
   createDialog: (params: CreateDialogProps) =>
     new Promise(async (resolve) => {
       const feedback = await ipcRenderer.invoke(
@@ -81,6 +85,12 @@ const api: WindowApi = {
         callback
       );
   },
+  onShortcutCalled: (key: string, cb: () => void) => {
+    ipcRenderer.on(IPC_EVENTS.SHORTCUT_CALLED + key, (_event) => cb());
+    return () =>
+      ipcRenderer.removeListener(IPC_EVENTS.SHORTCUT_CALLED + key, cb);
+  },
+
   logger: {
     debug: (message: string, ...meta: any[]) =>
       ipcRenderer.send(IPC_EVENTS.LOG_DEBUG, message, ...meta),

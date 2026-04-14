@@ -5,6 +5,7 @@ import {
   type IpcMainEvent,
   IpcMainInvokeEvent,
   WebContentsView,
+  app,
 } from "electron";
 import path from "node:path";
 import type { WindowNames } from "@common/types";
@@ -14,6 +15,7 @@ import logManager from "./LogService";
 import themeManager from "./ThemeService";
 import configManager from "./ConfigService";
 import { createLogo } from "../utils";
+import shortcutManager from "./ShortcutService";
 
 interface SizeOptions {
   width: number;
@@ -104,6 +106,8 @@ class WindowService {
       isHiddenWin,
       size,
     });
+    this._handleWindowShortcuts(window);
+
     if (!isHiddenWin) {
       this._winStates[name].instance = window;
       this._winStates[name].onCreate.forEach((callback) => callback(window));
@@ -189,6 +193,30 @@ class WindowService {
           icon: this._logo,
           ...opts,
         });
+  }
+  private _handleWindowShortcuts(win: BrowserWindow) {
+    const isPackaged = app.isPackaged;
+
+    const proxyCloseEvent = () => {
+      this.close(win, this._isReallyClose(this.getName(win)));
+      return true;
+    };
+
+    shortcutManager.registerForWindow(win, (input) => {
+      if (input.key === "F4" && input.alt && process.platform !== "darwin")
+        return proxyCloseEvent();
+      if (input.code === "KeyW" && input.modifiers.includes("control"))
+        return proxyCloseEvent();
+      if (!isPackaged) return;
+      // 禁用 开发者工具
+      if (
+        input.type === "keyDown" &&
+        input.code === "KeyI" &&
+        input.modifiers.includes("control") &&
+        input.modifiers.includes("shift")
+      )
+        return true;
+    });
   }
   private _setupWinLifecycle(window: BrowserWindow, name: WindowNames) {
     const updateWinStatus = debounce(

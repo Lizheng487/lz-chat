@@ -4,6 +4,9 @@ import ProviderSelect from './ProviderSelect.vue'
 import NativeTooltip from './NativeTooltip.vue'
 import { Icon as IconifyIcon } from '@iconify/vue'
 import { NButton, NIcon } from 'naive-ui'
+import { SHORTCUT_KEYS } from '@common/constants';
+import { listenShortcut } from '@renderer/utils/shortcut';
+
 interface Props {
   placeholder?: string
   status?: 'loading' | 'streaming' | 'normal'
@@ -46,6 +49,14 @@ function handelSend() {
   if (isBtnDisabled.value) return
   emits('send', message.value)
 }
+const removeShortcutListeners = listenShortcut(SHORTCUT_KEYS.SEND_MESSAGE, () => {
+  if (props.status === 'streaming') return
+  if (isBtnDisabled.value) return
+  if (!focused.value) return
+  handelSend();
+});
+onUnmounted(() => removeShortcutListeners());
+
 watch(() => selectedProvider.value, (val) => emits('select', val))
 defineExpose({
   selectedProvider,

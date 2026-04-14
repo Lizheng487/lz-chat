@@ -30,7 +30,7 @@ interface DialogueBackStream {
   messageId: number;
   data: UniversalChunk & { isError?: boolean };
 }
-type WindowNames = 'main' | 'setting' | 'dialog';
+type WindowNames = "main" | "setting" | "dialog";
 
 interface WindowApi {
   openWindow: (name: WindowNames) => void;
@@ -60,6 +60,8 @@ interface WindowApi {
     cb: (data: DialogueBackStream) => void,
     messageId: number
   ) => () => void;
+  onShortcutCalled: (key: stirng, cb: () => void) => () => void;
+
   logger: {
     debug: (message: string, ...meta: any[]) => void;
     info: (message: string, ...meta: any[]) => void;

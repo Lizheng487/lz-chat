@@ -8,6 +8,7 @@ import {
   CONVERSATION_LIST_MENU_IDS,
   MESSAGE_ITEM_MENU_IDS,
   CONFIG_KEYS,
+  SHORTCUT_KEYS,
 } from "@common/constants";
 import { windowManager } from "../service/WindowService";
 import { menuManager } from "../service/MenuService";
@@ -15,6 +16,7 @@ import { logManager } from "../service/LogService";
 import { createProvider } from "../providers";
 import configManager from "../service/ConfigService";
 import trayManager from "@main/service/TrayService";
+import { shortcutManager } from "../service/ShortcutService";
 
 const handleTray = (minimizeToTray: boolean) => {
   if (minimizeToTray) {
@@ -178,6 +180,22 @@ const registerMenus = (window: BrowserWindow) => {
     },
   ]);
 };
+
+const destroyMenus = () => {
+  menuManager.destroyMenu(MENU_IDS.CONVERSATION_ITEM);
+  menuManager.destroyMenu(MENU_IDS.CONVERSATION_LIST);
+  menuManager.destroyMenu(MENU_IDS.MESSAGE_ITEM);
+};
+
+const registerShortcuts = (window: BrowserWindow) => {
+  shortcutManager.registerForWindow(window, (input) => {
+    if (input.code === "Enter" && input.modifiers.includes("control"))
+      window?.webContents.send(
+        IPC_EVENTS.SHORTCUT_CALLED + SHORTCUT_KEYS.SEND_MESSAGE
+      );
+  });
+};
+
 export function setupMainWindow() {
   windowManager.onWindowCreate(WINDOW_NAMES.MAIN, (mainWindow) => {
     let minimizeToTray = configManager.get(CONFIG_KEYS.MINIMIZE_TO_TRAY);
@@ -188,8 +206,12 @@ export function setupMainWindow() {
     });
     handleTray(minimizeToTray);
     registerMenus(mainWindow);
+    registerShortcuts(mainWindow);
   });
   windowManager.create(WINDOW_NAMES.MAIN, MAIN_WIN_SIZE);
+  windowManager.onWindowClosed(WINDOW_NAMES.MAIN, () => {
+    destroyMenus();
+  });
   ipcMain.on(
     IPC_EVENTS.START_A_DIALOGUE,
     async (_event, props: CreateDialogueProps) => {
@@ -231,3 +253,4 @@ export function setupMainWindow() {
     }
   );
 }
+export default setupMainWindow;

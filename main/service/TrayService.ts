@@ -10,6 +10,7 @@ import {
 import logManager from "./LogService";
 import windowManager from "./WindowService";
 import configManager from "./ConfigService";
+import shortcutManager from "./ShortcutService";
 
 let t: ReturnType<typeof createTranslator> = createTranslator();
 
@@ -48,6 +49,7 @@ class TrayService {
       windowManager.create(WINDOW_NAMES.MAIN, MAIN_WIN_SIZE);
     };
     this._tray.setToolTip(t("tray.tooltip") ?? "LzChat");
+    shortcutManager.register("CmdOrCtrl+N", "tray.showWindow", showWindow);
     this._tray.setContextMenu(
       Menu.buildFromTemplate([
         {
@@ -82,11 +84,13 @@ class TrayService {
     this._updateTray();
     app.on("quit", () => {
       this.destroy();
+      shortcutManager.unregister("tray.showWindow");
     });
   }
   public destroy() {
     this._tray?.destroy();
     this._tray = null;
+    shortcutManager.unregister("tray.showWindow");
     if (this._removeLanguageListener) {
       this._removeLanguageListener();
       this._removeLanguageListener = void 0;

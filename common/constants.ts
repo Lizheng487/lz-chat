@@ -20,6 +20,11 @@ export enum IPC_EVENTS {
   LOG_FATAL = "log-fatal",
   THEME_MODE_UPDATED = "theme-mode-updated",
   CONFIG_UPDATED = "config-updated",
+  SHORTCUT_CALLED = 'shortcut-called',
+}
+export enum SHORTCUT_KEYS {
+  CLOSE_WINDOW = 'CmdOrCtrl+W',
+  SEND_MESSAGE = 'CmdOrCtrl+Enter',
 }
 export enum WINDOW_NAMES {
   MAIN = "main",
