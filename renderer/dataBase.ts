@@ -6,11 +6,11 @@ import { stringifyOpenAISetting } from "@common/utils";
 export const providers: Provider[] = [
   {
     id: 1,
-    name: "bigmodel",
-    title: "智谱AI",
-    models: ["glm-4.7-flash"],
+    name: "Claude",
+    title: "Claude",
+    models: ["claude-opus-4-6", "claude-sonnet-4-6"],
     openAISetting: stringifyOpenAISetting({
-      baseURL: "https://open.bigmodel.cn/api/paas/v4",
+      baseURL: "https://api.anthropic.com/v1",
       apiKey: "",
     }),
     createdAt: new Date().getTime(),
@@ -18,18 +18,6 @@ export const providers: Provider[] = [
   },
   {
     id: 2,
-    name: "deepseek",
-    title: "深度求索 (DeepSeek)",
-    models: ["deepseek-chat"],
-    openAISetting: stringifyOpenAISetting({
-      baseURL: "https://api.deepseek.com/v1",
-      apiKey: "",
-    }),
-    createdAt: new Date().getTime(),
-    updatedAt: new Date().getTime(),
-  },
-  {
-    id: 3,
     name: "ChatGPT",
     title: "ChatGPT",
     models: ["gpt-4.1", "gpt-4.1-mini"],
@@ -41,12 +29,24 @@ export const providers: Provider[] = [
     updatedAt: new Date().getTime(),
   },
   {
-    id: 4,
-    name: "Claude",
-    title: "Claude",
-    models: ["claude-opus-4-6", "claude-sonnet-4-6"],
+    id: 3,
+    name: "deepseek",
+    title: "深度求索 (DeepSeek)",
+    models: ["deepseek-chat"],
     openAISetting: stringifyOpenAISetting({
-      baseURL: "https://api.anthropic.com/v1",
+      baseURL: "https://api.deepseek.com/v1",
+      apiKey: "",
+    }),
+    createdAt: new Date().getTime(),
+    updatedAt: new Date().getTime(),
+  },
+  {
+    id: 4,
+    name: "bigmodel",
+    title: "智谱AI",
+    models: ["glm-4.7-flash"],
+    openAISetting: stringifyOpenAISetting({
+      baseURL: "https://open.bigmodel.cn/api/paas/v4",
       apiKey: "",
     }),
     createdAt: new Date().getTime(),
