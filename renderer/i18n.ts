@@ -1,4 +1,6 @@
 import { createI18n, I18n, type I18nOptions } from "vue-i18n";
+import logger from "./utils/logger";
+import { CONFIG_KEYS } from "@common/constants";
 const languages = ["zh", "en"] as const;
 type LanguageType = (typeof languages)[number];
 
@@ -13,7 +15,18 @@ async function createI18nInstance() {
     },
   };
   const i18n = createI18n(options);
+  await handleConfigManager(i18n);
   return i18n;
+}
+async function handleConfigManager(i18n: I18n) {
+  try {
+    const saveLang: LanguageType = await window.api.getConfig(
+      CONFIG_KEYS.LANGUAGE
+    );
+    saveLang && languages.includes(saveLang) && setLanguage(saveLang, i18n);
+  } catch (error) {
+    logger.warn("Failed to handle config manager", error);
+  }
 }
 export const i18n = await createI18nInstance();
 export function setLanguage(lang: LanguageType, _i18n?: I18n) {
