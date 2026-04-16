@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import type { Provider } from '@common/types';
-import { NCollapse, NCollapseItem, NSwitch, NInput, NInputGroup, NInputGroupLabel, NDynamicTags, NDivider, NSelect } from 'naive-ui';
+import { NCollapse, NCollapseItem, NSwitch, NInput, NInputGroup, NInputGroupLabel, NCard, NDynamicTags, NDivider, NSelect, NSpace, useMessage, NButton } from 'naive-ui';
 import { stringifyOpenAISetting } from '@common/utils';
 import { useProvidersStore } from '@renderer/stores/providers';
 import { useConfig } from '@renderer/hooks/useConfig';
 import { CONFIG_KEYS } from '@common/constants';
 
+const message = useMessage();
+const { t } = useI18n()
 const providersStore = useProvidersStore();
 const config = useConfig();
 
@@ -50,6 +52,11 @@ function handleBaseURLUpdate(id: number, baseURL: string) {
   if (!baseURL || !apiKey) update.visible = false
   providersStore.updateProvider(id, { ...update })
 }
+function copyURL(url: string) {
+  navigator.clipboard.writeText(url).then(() => {
+    message.success(t('main.message.dialog.copySuccess'));
+  });
+}
 onMounted(() => providersStore.initialize())
 </script>
 <template>
@@ -82,4 +89,21 @@ onMounted(() => providersStore.initialize())
         @update:value="(v: any) => providersStore.updateProvider(provider.id, { models: v })" />
     </n-collapse-item>
   </n-collapse>
+  <n-divider />
+  <NCard title=" API Key 获取链接">
+    <NSpace vertical>
+      <NButton type="primary" @click="copyURL('https://console.anthropic.com')" text>
+        Claude : https://console.anthropic.com
+      </NButton>
+      <NButton type="primary" @click="copyURL('https://platform.openai.com')" text>
+        ChatGPT : https://platform.openai.com
+      </NButton>
+      <NButton type="primary" @click="copyURL('https://platform.deepseek.com/')" text>
+        DeepSeek : https://platform.deepseek.com/
+      </NButton>
+      <NButton type="primary" @click="copyURL('https://bigmodel.cn/')" text>
+        智谱 AI : https://bigmodel.cn/
+      </NButton>
+    </NSpace>
+  </NCard>
 </template>

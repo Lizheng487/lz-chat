@@ -59,6 +59,7 @@
   "settings": {
     "title": "设置",
     "base": "基础设置",
+    "Instructions": "使用说明",
     "provider": {
       "modelConfig": "模型配置"
     },

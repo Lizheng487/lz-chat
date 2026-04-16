@@ -17,7 +17,10 @@
   },
   "build": {
     "appId": "com.lizheng.LzChat",
-    "icon": "public/logo.ico"
+    "icon": "public/logo.ico",
+    "win": {
+      "icon": "public/logo.ico"
+    }
   },
   "license": "MIT",
   "devDependencies": {

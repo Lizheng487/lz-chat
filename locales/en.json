@@ -59,6 +59,7 @@
   "settings": {
     "title": "Settings",
     "base": "Basic Settings",
+    "Instructions": "Instructions for Use",
     "provider": {
       "modelConfig": "Model Configuration"
     },

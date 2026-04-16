@@ -1,10 +1,11 @@
 const { FusesPlugin } = require("@electron-forge/plugin-fuses");
 const { FuseV1Options, FuseVersion } = require("@electron/fuses");
+const path = require("path");
 
 module.exports = {
   packagerConfig: {
     name: "LzChat",
-    icon: "/public/logo.ico",
+    icon: path.resolve(__dirname, "public/logo.ico"),
     asar: true,
   },
   rebuildConfig: {},

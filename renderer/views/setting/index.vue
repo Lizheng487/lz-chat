@@ -5,11 +5,12 @@ import { useNaiveTheme } from '@renderer/hooks/useNaiveTheme';
 import { useNaiveLocale } from '@renderer/hooks/useNaiveLocale';
 import { useFontSize } from '@renderer/hooks/useFontSize';
 import ProvidersConfig from './providers.vue';
+import StartGuide from './start.vue';
 
 useFontSize();
 const { theme, themeOverrides } = useNaiveTheme();
 const { locale, dateLocale } = useNaiveLocale();
-const activeTab = ref('basic');
+const activeTab = ref('start');
 const formModel = useConfig()
 const languageOptions = [
   {
@@ -40,7 +41,7 @@ const fontSizeOptions = computed(() => [
 
 const { t } = useI18n();
 function onWindowClose() {
-  setTimeout(() => activeTab.value = 'basic', 300);
+  setTimeout(() => activeTab.value = 'start', 300);
 }
 
 </script>
@@ -52,7 +53,13 @@ function onWindowClose() {
         <drag-region class="p-2 text-[16px]">{{ t('settings.title') }}</drag-region>
       </title-bar>
       <n-scrollbar class="h-full p-4">
-        <n-tabs class="h-full" size="large" animated default-value="basic" v-model:value="activeTab">
+        <n-tabs class="h-full" size="large" animated default-value="start" v-model:value="activeTab">
+          <n-tab-pane name="start" tab="t('settings.Instructions')">
+            <start-guide />
+          </n-tab-pane>
+          <n-tab-pane name="provider" :tab="t('settings.provider.modelConfig')">
+            <providers-config />
+          </n-tab-pane>
           <n-tab-pane name="basic" :tab="t('settings.base')">
             <n-form :model="formModel">
               <n-form-item :label="t('settings.theme.label')" path="themeMode">
@@ -71,9 +78,6 @@ function onWindowClose() {
                 <n-switch v-model:value="formModel.minimizeToTray" />
               </n-form-item>
             </n-form>
-          </n-tab-pane>
-          <n-tab-pane name="provider" :tab="t('settings.provider.modelConfig')">
-            <providers-config />
           </n-tab-pane>
         </n-tabs>
       </n-scrollbar>
