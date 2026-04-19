@@ -63,6 +63,29 @@
     "provider": {
       "modelConfig": "Model Configuration"
     },
+    "startGuide": {
+      "description": "This software provides a free API Key for Zhipu AI's GLM model. Go to Model Configuration -> Zhipu AI and enable it to use.",
+      "tryConversation": "Go try your first conversation now!",
+      "apiKeyLinks": "API Key Links",
+      "apiKeyIntro": "Here are the links to get four API Keys:",
+      "deepseekGuide": "DeepSeek API Key Application Tutorial",
+      "deepseekSteps": {
+        "step1": "Step 1: Visit DeepSeek Platform",
+        "step1Content": "Open your browser and visit",
+        "step2": "Step 2: Register/Login Account",
+        "step2Content": "Click the register/login button in the upper right corner and follow the prompts to complete account registration or login",
+        "step3": "Step 3: Enter API Key Management Page",
+        "step3Content": "After logging in, find the \"API Key\" or \"Key Management\" option in the left navigation bar and click to enter",
+        "step4": "Step 4: Create a New API Key",
+        "step4Content": "Click the \"Create API Key\" or similar button, name your API Key, and then click confirm",
+        "step5": "Step 5: Copy API Key",
+        "step5Content": "After successful creation, the system will display your API Key. Please copy and save it immediately because it will only be displayed once",
+        "step6": "Step 6: Configure in This Software",
+        "step6Content": "Go to the model configuration page of this software, paste the API Key you just copied into the API Key input box of the DeepSeek provider, then click the button on the right to enable it.",
+        "step7": "Step 7: Start AI Conversation",
+        "step7Content": "Now you can select DeepSeek from the model list on the homepage and start chatting with the AI model."
+      }
+    },
     "theme": {
       "label": "Theme Settings",
       "dark": "Dark Theme",

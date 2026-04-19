@@ -90,7 +90,7 @@ onMounted(() => providersStore.initialize())
     </n-collapse-item>
   </n-collapse>
   <n-divider />
-  <NCard title=" API Key 获取链接">
+  <NCard :title="t('settings.startGuide.apiKeyLinks')">
     <NSpace vertical>
       <NButton type="primary" @click="copyURL('https://console.anthropic.com')" text>
         Claude : https://console.anthropic.com

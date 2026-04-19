@@ -54,7 +54,7 @@ function onWindowClose() {
       </title-bar>
       <n-scrollbar class="h-full p-4">
         <n-tabs class="h-full" size="large" animated default-value="start" v-model:value="activeTab">
-          <n-tab-pane name="start" tab="t('settings.Instructions')">
+          <n-tab-pane name="start" :tab="t('settings.Instructions')">
             <start-guide />
           </n-tab-pane>
           <n-tab-pane name="provider" :tab="t('settings.provider.modelConfig')">
