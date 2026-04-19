@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![LzChat](public/logo.ico)
+![LzChat](public/logo.png)
 
 **一款基于 Electron + Vue 3 构建的现代化 AI 聊天桌面应用**
 
